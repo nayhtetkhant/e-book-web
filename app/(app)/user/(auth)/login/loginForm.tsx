@@ -18,22 +18,19 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-
-type LoginFormData = {
-  email: string;
-  password: string;
-}
+import { LoginFormType } from "@/app/(app)/admin/(auth)/login/loginForm"
+import { userLogin } from "@/app/actions/user/auth"
 
 export default function AdminLoginForm() {
-  const form = useForm<LoginFormData>({
+  const form = useForm<LoginFormType>({
     defaultValues: {
       email: "",
       password: "",
     },
   })
 
-  function onSubmit(data: LoginFormData) {
-    console.log(data)
+  async function onSubmit(data: LoginFormType) {
+    await userLogin(data);
   }
 
   return (
