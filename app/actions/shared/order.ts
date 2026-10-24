@@ -18,3 +18,16 @@ export default async function createOrder(
         console.log(error);
     }
 }
+
+export async function getAllOrders(role: "admin" | "user") {
+    try {
+        const serverApi = await api();
+        const response = await serverApi.get("/" + role + "/v1/orders");
+
+        console.log(response.data);
+
+        return response.data.data ?? response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
