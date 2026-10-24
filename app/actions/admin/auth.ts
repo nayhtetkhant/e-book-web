@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { LoginFormType } from "@/app/(app)/admin/(auth)/login/loginForm";
 import api from "@/app/libs/api";

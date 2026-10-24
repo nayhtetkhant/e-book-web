@@ -1,5 +1,3 @@
 export default function Download() {
-  return <div>
-    download
-  </div>;
+    return <div>download</div>;
 }
