@@ -8,3 +8,24 @@ export async function getProducts(role: "admin" | "user") {
 
     return response.data.data ?? response.data;
 }
+
+export async function createProduct(role: "admin" | "user", data: any) {
+    const serverApi = await api();
+    const response = await serverApi.post("/" + role + "/v1/products", data);
+
+    return response.data.data ?? response.data;
+}
+
+export async function updateProduct(
+    id: number,
+    role: "admin" | "user",
+    data: any,
+) {
+    const serverApi = await api();
+    const response = await serverApi.put(
+        "/" + role + "/v1/products/" + id,
+        data,
+    );
+
+    return response.data.data ?? response.data;
+}
