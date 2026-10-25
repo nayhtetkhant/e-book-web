@@ -24,7 +24,7 @@ export async function getAllOrders(role: "admin" | "user") {
         const serverApi = await api();
         const response = await serverApi.get("/" + role + "/v1/orders");
 
-        console.log(response.data);
+        console.log("orders", response.data);
 
         return response.data.data ?? response.data;
     } catch (error) {
