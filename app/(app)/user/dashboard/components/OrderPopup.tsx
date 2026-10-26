@@ -38,7 +38,11 @@ export default function OrderPopup({
         }, 0) || 0;
 
     const handleClose = async () => {
-        await createOrder("user", { products: orders });
+        const data =  await createOrder("user", { products: orders });
+        const checkoutUrl = data.checkoutUrl;
+        if (checkoutUrl) {
+            window.location.href = checkoutUrl;
+        }
         onClose();
         router.push("/user/dashboard/order");
     };
