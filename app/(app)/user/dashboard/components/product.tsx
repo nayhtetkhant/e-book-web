@@ -12,6 +12,7 @@ export interface ProductType {
     title: string;
     description: string;
     price: number;
+    filePath?: string;
 }
 
 export interface OrderType {

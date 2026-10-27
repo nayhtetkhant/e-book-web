@@ -29,3 +29,18 @@ export async function updateProduct(
 
     return response.data.data ?? response.data;
 }
+
+
+export async function getOrderedProducts() {
+    const serverApi = await api();
+    const response = await serverApi.get("/user/v1/ordered");
+
+    return response.data.data ?? response.data;
+}
+
+export async function getOrderDownloadUrl(id: number) {
+    const serverApi = await api();
+    const response = await serverApi.get("/user/v1/products/" + id + "/download");
+
+    return response.data.data ?? response.data;
+}

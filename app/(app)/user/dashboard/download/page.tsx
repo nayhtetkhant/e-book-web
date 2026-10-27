@@ -1,3 +1,7 @@
+import DownloadList from "./components/downloadList";
+
 export default function Download() {
-    return <div>download</div>;
+    return <div>
+        <DownloadList />
+    </div>;
 }

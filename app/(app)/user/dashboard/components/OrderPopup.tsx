@@ -94,7 +94,7 @@ export default function OrderPopup({
                                                     {product?.price.toFixed(
                                                         2,
                                                     ) || "0.00"}{" "}
-                                                    × {order.quantity}
+                                                    {order.quantity}
                                                 </span>
                                             </div>
                                         </div>

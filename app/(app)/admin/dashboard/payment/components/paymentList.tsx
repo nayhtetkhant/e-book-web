@@ -77,7 +77,7 @@ export default function PaymentList() {
             ) : (
                 /* Payment Cards Grid */
                 <div className="grid gap-4">
-                    {payments?.map((payment) => (
+                    {payments?.toReversed().map((payment) => (
                         <Card key={payment.id} className="flex justify-between items-center p-4">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-3">
