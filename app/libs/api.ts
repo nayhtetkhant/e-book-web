@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { cookies } from "next/headers";
 
 const instance = axios.create({
-    baseURL: process.env(BACKEND_URL),
+    baseURL: `${process.env.API_BASE_URL?.replace(/\/$/, "")}/api`,
     timeout: 10000,
     headers: {
         "Content-Type": "application/json",

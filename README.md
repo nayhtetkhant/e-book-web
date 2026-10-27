@@ -85,6 +85,7 @@ For downloads, the frontend requests a URL on demand. The companion backend curr
 git clone https://github.com/nayhtetkhant/e-book-web.git
 cd e-book-web
 npm ci
+cp .env.example .env
 npm run dev
 ```
 
@@ -92,13 +93,13 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### API Configuration
 
-The API base URL is currently set in `app/libs/api.ts`:
+Set the backend API base URL in the project-root `.env` file:
 
-```ts
-baseURL: "http://localhost:8000/api"
+```dotenv
+API_BASE_URL=http://localhost:8000
 ```
 
-Change it to match your API deployment. Environment-based configuration is a planned improvement; adding an environment variable alone will not change the current client.
+`app/libs/api.ts` reads `process.env.API_BASE_URL` on the server. Set this value to your backend origin (scheme, domain, and optional port), without a path. The API client appends `/api`. Update it for your deployment and restart the development server after editing it. `.env` is ignored by Git; `.env.example` provides the setup template.
 
 Set up the [Laravel backend](https://github.com/nayhtetkhant/e-book-api) separately, including database migrations, development users, Stripe webhook delivery, and S3 credentials. Configure S3 CORS to allow the frontend origin to upload using PUT requests.
 
