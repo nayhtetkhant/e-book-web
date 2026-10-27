@@ -8,17 +8,10 @@ export default async function createOrder(
     role: "admin" | "user",
     order: { products: OrderType[] },
 ) {
-    try {
-        const serverApi = await api();
-        const response = await serverApi.post("/" + role + "/v1/orders", order);
+    const serverApi = await api();
+    const response = await serverApi.post("/" + role + "/v1/orders", order);
 
-        console.log(response.data);
-
-        return response.data.data ?? response.data;
-    } catch (error) {
-        unstable_rethrow(error);
-        console.log(error);
-    }
+    return response.data.data ?? response.data;
 }
 
 export async function getAllOrders(role: "admin" | "user") {

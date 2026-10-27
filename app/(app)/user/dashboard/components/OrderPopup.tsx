@@ -13,14 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Lock, ShoppingBag } from "lucide-react";
 import { OrderType, ProductType } from "./product";
 import createOrder from "@/app/actions/shared/order";
-import { useRouter } from "next/navigation";
 import BookCover from "./bookCover";
 
 interface PopupProps {
     isOpen: boolean;
     orders: OrderType[];
     products: ProductType[];
-    onClose: () => void;
     onDismiss: () => void;
 }
 
@@ -28,11 +26,10 @@ export default function OrderPopup({
     isOpen,
     orders,
     products,
-    onClose,
     onDismiss,
 }: PopupProps) {
-    const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const grandTotal =
         orders?.reduce((sum, order) => {
@@ -42,15 +39,39 @@ export default function OrderPopup({
             return sum + (product ? product.price * order.quantity : 0);
         }, 0) || 0;
 
-    const handleClose = async () => {
-        setIsSubmitting(true);
-        const data = await createOrder("user", { products: orders });
-        const checkoutUrl = data?.checkoutUrl;
-        if (checkoutUrl) {
-            window.location.href = checkoutUrl;
+    const handleCheckout = async () => {
+        if (isSubmitting) return;
+
+        const checkoutTab = window.open("about:blank", "_blank");
+        if (!checkoutTab) {
+            setError("Allow pop-ups to open Stripe checkout in a new tab.");
+            return;
         }
-        onClose();
-        router.push("/user/dashboard/order");
+        checkoutTab.opener = null;
+
+        setIsSubmitting(true);
+        setError(null);
+
+        try {
+            const data = await createOrder("user", { products: orders });
+            const checkoutUrl = data?.checkoutUrl;
+
+            if (typeof checkoutUrl !== "string" || !checkoutUrl) {
+                throw new Error("Checkout is unavailable. Please try again.");
+            }
+
+            if (checkoutTab.closed) {
+                throw new Error("Checkout tab was closed.");
+            }
+
+            checkoutTab.location.replace(checkoutUrl);
+            onDismiss();
+        } catch {
+            checkoutTab.close();
+            setError("Unable to open checkout. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -125,10 +146,12 @@ export default function OrderPopup({
                     </p>
                 )}
 
+                {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+
                 <DialogFooter className="flex-col gap-2 sm:flex-col">
                     <Button
                         size="lg"
-                        onClick={handleClose}
+                        onClick={handleCheckout}
                         disabled={isSubmitting || !orders?.length}
                         className="w-full gap-2"
                     >
@@ -137,7 +160,7 @@ export default function OrderPopup({
                         ) : (
                             <Lock className="size-4" />
                         )}
-                        {isSubmitting ? "Redirecting..." : "Proceed to Checkout"}
+                        {isSubmitting ? "Opening checkout..." : "Proceed to Checkout"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

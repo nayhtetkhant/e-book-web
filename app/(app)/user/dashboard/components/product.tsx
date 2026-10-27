@@ -53,11 +53,6 @@ export default function Product() {
         }
     }
 
-    function handleClose() {
-        setIsOpenPopup(false);
-        setCard(null);
-    }
-
     const cartCount = card
         ? card.reduce((acc, item) => acc + item.quantity, 0)
         : 0;
@@ -184,7 +179,6 @@ export default function Product() {
                     isOpen={isOpenPopup}
                     orders={card}
                     products={products}
-                    onClose={handleClose}
                     onDismiss={() => setIsOpenPopup(false)}
                 />
             )}
