@@ -1,5 +1,6 @@
 "use client"
 
+import { LogoutButton } from "@/components/logout-button";
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
@@ -61,6 +62,7 @@ export default function DashboardLayoutShell({ children }: { children: React.Rea
                 )
               })}
             </SidebarMenu>
+            <div className="px-4 py-2"><LogoutButton /></div>
           </SidebarContent>
         </Sidebar>
 

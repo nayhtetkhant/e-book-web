@@ -1,5 +1,6 @@
 "use client";
 
+import { LogoutButton } from "@/components/logout-button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
@@ -72,6 +73,7 @@ export default function DashboardLayoutShell({
                             );
                         })}
                     </nav>
+                    <LogoutButton />
                 </div>
             </header>
 
