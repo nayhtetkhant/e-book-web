@@ -11,7 +11,7 @@ export async function logout() {
 
     if (cookieStore.has("auth-token")) {
         try {
-            const serverApi = await api();
+            const serverApi = await api({ redirectOnUnauthorized: false });
             await serverApi.post(`/${role}/v1/logout`);
         } catch (error) {
             if (!axios.isAxiosError(error) || error.response?.status !== 401) {

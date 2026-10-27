@@ -1,6 +1,7 @@
 "use server";
 
 import { OrderType } from "@/app/(app)/user/dashboard/components/product";
+import { unstable_rethrow } from "next/navigation";
 import api from "@/app/libs/api";
 
 export default async function createOrder(
@@ -15,6 +16,7 @@ export default async function createOrder(
 
         return response.data.data ?? response.data;
     } catch (error) {
+        unstable_rethrow(error);
         console.log(error);
     }
 }
@@ -28,6 +30,7 @@ export async function getAllOrders(role: "admin" | "user") {
 
         return response.data.data ?? response.data;
     } catch (error) {
+        unstable_rethrow(error);
         console.log(error);
     }
 }

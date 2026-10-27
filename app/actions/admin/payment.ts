@@ -1,5 +1,6 @@
 'use server';
 
+import { unstable_rethrow } from "next/navigation";
 import api from '@/app/libs/api';
 
 export default async function getAllPayments() {
@@ -11,6 +12,7 @@ export default async function getAllPayments() {
 
         return response.data.data ?? response.data;
     } catch (error) {
+        unstable_rethrow(error);
         console.log(error);
     }
 }

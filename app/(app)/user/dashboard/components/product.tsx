@@ -32,7 +32,7 @@ export default function Product() {
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const data = await getProducts("admin");
+                const data = await getProducts("user");
                 setProducts(data);
             } catch (error) {
                 console.error("Failed to fetch products:", error);
