@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -9,16 +10,18 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, ShoppingBag } from "lucide-react";
+import { Loader2, Lock, ShoppingBag } from "lucide-react";
 import { OrderType, ProductType } from "./product";
 import createOrder from "@/app/actions/shared/order";
 import { useRouter } from "next/navigation";
+import BookCover from "./bookCover";
 
 interface PopupProps {
     isOpen: boolean;
     orders: OrderType[];
     products: ProductType[];
     onClose: () => void;
+    onDismiss: () => void;
 }
 
 export default function OrderPopup({
@@ -26,8 +29,10 @@ export default function OrderPopup({
     orders,
     products,
     onClose,
+    onDismiss,
 }: PopupProps) {
     const router = useRouter();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const grandTotal =
         orders?.reduce((sum, order) => {
@@ -38,8 +43,9 @@ export default function OrderPopup({
         }, 0) || 0;
 
     const handleClose = async () => {
-        const data =  await createOrder("user", { products: orders });
-        const checkoutUrl = data.checkoutUrl;
+        setIsSubmitting(true);
+        const data = await createOrder("user", { products: orders });
+        const checkoutUrl = data?.checkoutUrl;
         if (checkoutUrl) {
             window.location.href = checkoutUrl;
         }
@@ -48,26 +54,21 @@ export default function OrderPopup({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-md flex flex-col p-6 space-y-4">
-                {/* Success Icon Badge */}
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
-                    <CheckCircle2 className="h-6 w-6" />
-                </div>
-
-                <DialogHeader className="space-y-1 text-center">
-                    <DialogTitle className="text-xl font-bold">
-                        Order Summary
+        <Dialog open={isOpen} onOpenChange={onDismiss}>
+            <DialogContent className="flex flex-col gap-5 p-6 sm:max-w-md">
+                <DialogHeader className="space-y-1">
+                    <DialogTitle className="flex items-center gap-2 font-serif text-xl font-semibold">
+                        <ShoppingBag className="size-5 text-primary" />
+                        Your Cart
                     </DialogTitle>
                     <DialogDescription className="text-xs text-muted-foreground">
-                        Here are the items you have selected for your order.
+                        Review your books before heading to secure checkout.
                     </DialogDescription>
                 </DialogHeader>
 
-                {/* Mapped Order Items Container */}
-                <div className="max-h-60 overflow-y-auto divide-y divide-border rounded-md border bg-card text-card-foreground p-3 space-y-2">
-                    {orders && orders.length > 0 ? (
-                        <>
+                {orders && orders.length > 0 ? (
+                    <div className="space-y-4">
+                        <ul className="max-h-72 space-y-3 overflow-y-auto pr-1">
                             {orders.map((order, index) => {
                                 const product = products.find(
                                     (p: ProductType) => p.id === order.id,
@@ -77,58 +78,66 @@ export default function OrderPopup({
                                     : 0;
 
                                 return (
-                                    <div
+                                    <li
                                         key={index}
-                                        className="flex items-center justify-between pt-2 first:pt-0 text-sm text-muted-foreground"
+                                        className="flex items-center gap-3"
                                     >
-                                        <div className="flex items-center gap-2.5 truncate pr-2">
-                                            <ShoppingBag className="h-4 w-4 text-muted-foreground shrink-0" />
-                                            <div className="truncate flex flex-col">
-                                                <span className="font-medium truncate">
-                                                    {product
-                                                        ? product.title
-                                                        : `Product ID: ${order.id}`}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    $
-                                                    {product?.price.toFixed(
-                                                        2,
-                                                    ) || "0.00"}{" "}
-                                                    {order.quantity}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="text-right shrink-0">
-                                            <span className="text-xs font-semibold bg-muted px-2 py-1 rounded-sm border">
-                                                ${itemTotal.toFixed(2)}
+                                        <BookCover
+                                            id={order.id}
+                                            title={product?.title ?? ""}
+                                            size="sm"
+                                            className="h-14 w-10 shrink-0"
+                                        />
+                                        <div className="flex min-w-0 flex-1 flex-col">
+                                            <span className="truncate text-sm font-medium">
+                                                {product
+                                                    ? product.title
+                                                    : `Product ID: ${order.id}`}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">
+                                                $
+                                                {product?.price.toFixed(2) ||
+                                                    "0.00"}{" "}
+                                                × {order.quantity}
                                             </span>
                                         </div>
-                                    </div>
+                                        <span className="shrink-0 text-sm font-semibold">
+                                            ${itemTotal.toFixed(2)}
+                                        </span>
+                                    </li>
                                 );
                             })}
+                        </ul>
 
-                            {/* Grand Total Section */}
-                            <div className="pt-3 mt-3 border-t flex items-center justify-between font-semibold text-base">
-                                <span>Grand Total:</span>
-                                <span className="text-primary">
-                                    ${grandTotal.toFixed(2)}
-                                </span>
-                            </div>
-                        </>
-                    ) : (
-                        <p className="text-center text-sm text-muted-foreground py-4">
-                            No items in the order.
-                        </p>
-                    )}
-                </div>
+                        {/* Grand Total Section */}
+                        <div className="flex items-center justify-between rounded-xl bg-muted/60 px-4 py-3">
+                            <span className="text-sm text-muted-foreground">
+                                Total
+                            </span>
+                            <span className="text-xl font-semibold">
+                                ${grandTotal.toFixed(2)}
+                            </span>
+                        </div>
+                    </div>
+                ) : (
+                    <p className="py-4 text-center text-sm text-muted-foreground">
+                        Your cart is empty.
+                    </p>
+                )}
 
-                <DialogFooter className="w-full sm:justify-center">
+                <DialogFooter className="flex-col gap-2 sm:flex-col">
                     <Button
+                        size="lg"
                         onClick={handleClose}
-                        className="w-full sm:w-auto px-6"
+                        disabled={isSubmitting || !orders?.length}
+                        className="w-full gap-2"
                     >
-                        Confirm & Close
+                        {isSubmitting ? (
+                            <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                            <Lock className="size-4" />
+                        )}
+                        {isSubmitting ? "Redirecting..." : "Proceed to Checkout"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

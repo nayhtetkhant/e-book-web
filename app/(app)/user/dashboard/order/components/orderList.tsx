@@ -1,22 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { getAllOrders } from "@/app/actions/shared/order";
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    CardDescription,
-    CardFooter,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
-import { PackageOpen, ShoppingCart } from "lucide-react";
+import { ChevronRight, Receipt } from "lucide-react";
 import OrderDetailsPopup from "./orderDetailsPopup";
 import { ProductType } from "../../components/product";
+import BookCover from "../../components/bookCover";
+import { cn } from "@/lib/utils";
 
 export interface OrderDetailType {
     id: number;
@@ -24,6 +17,33 @@ export interface OrderDetailType {
     totalAmount: number;
     status: string;
     products: ProductType[];
+}
+
+const statusStyles: Record<string, string> = {
+    completed:
+        "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-950 dark:text-emerald-300",
+    paid: "bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-950 dark:text-emerald-300",
+    cancelled:
+        "bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-950 dark:text-rose-300",
+    failed: "bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-950 dark:text-rose-300",
+};
+
+const pendingStyle =
+    "bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-950 dark:text-amber-300";
+
+export function OrderStatus({ status }: { status?: string }) {
+    const key = (status || "pending").toLowerCase();
+    return (
+        <span
+            className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset",
+                statusStyles[key] ?? pendingStyle,
+            )}
+        >
+            <span className="size-1.5 rounded-full bg-current" />
+            {key}
+        </span>
+    );
 }
 
 export default function OrderList() {
@@ -38,7 +58,7 @@ export default function OrderList() {
         async function fetchOrders() {
             try {
                 const data = await getAllOrders("user");
-                setOrders(data);
+                setOrders(data ?? []);
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
             } finally {
@@ -53,97 +73,99 @@ export default function OrderList() {
         setIsPopupOpen(true);
     };
 
-    if (isLoading) {
-        return (
-            <div className="max-w-4xl mx-auto p-6 space-y-4">
-                <Skeleton className="h-8 w-48 mb-6" />
-                {[1, 2, 3].map((i) => (
-                    <Card key={i} className="p-6">
-                        <div className="flex justify-between items-center">
-                            <div className="space-y-2">
-                                <Skeleton className="h-4 w-32" />
-                                <Skeleton className="h-6 w-24" />
-                            </div>
-                            <Skeleton className="h-10 w-32" />
-                        </div>
-                    </Card>
-                ))}
-            </div>
-        );
-    }
-
-    if (orders.length === 0) {
-        return (
-            <Card className="max-w-md mx-auto mt-12 text-center p-8 border-dashed">
-                <CardContent className="flex flex-col items-center justify-center space-y-3 pt-6">
-                    <ShoppingCart className="w-12 h-12 text-muted-foreground stroke-1" />
-                    <p className="text-lg font-medium">No orders found</p>
-                    <p className="text-sm text-muted-foreground">
-                        You haven't placed any orders yet.
-                    </p>
-                </CardContent>
-            </Card>
-        );
-    }
-
     return (
-        <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <div className="mx-auto max-w-3xl space-y-8">
             <div>
-                <h1 className="text-2xl font-bold tracking-tight">
-                    Order History
+                <h1 className="font-serif text-3xl font-semibold tracking-tight">
+                    My Orders
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                    Manage and track your recent purchases.
+                    Track your purchases and see what&apos;s inside each order.
                 </p>
             </div>
 
-            <div className="grid gap-4">
-                {orders.toReversed().map((order) => {
-                    const statusVariant =
-                        order.status === "completed"
-                            ? "default"
-                            : order.status === "cancelled"
-                              ? "destructive"
-                              : "secondary";
-
-                    return (
-                        <Card
-                            key={order.id}
-                            className="transition-all hover:border-primary/50"
-                        >
-                            <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 gap-4">
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm font-semibold text-muted-foreground">
-                                            Order #{order.id}
-                                        </span>
-                                        <Badge
-                                            variant={statusVariant}
-                                            className="capitalize"
-                                        >
-                                            {order.status || "Pending"}
-                                        </Badge>
-                                    </div>
-                                    <p className="text-2xl font-bold tracking-tight">
-                                        ${order.totalAmount.toFixed(2)}
-                                    </p>
-                                </div>
-
-                                <Button
-                                    variant="outline"
-                                    className="gap-2 w-full sm:w-auto"
+            {isLoading ? (
+                <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+                    ))}
+                </div>
+            ) : orders.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed bg-background py-16 text-center">
+                    <span className="flex size-14 items-center justify-center rounded-full bg-muted">
+                        <Receipt className="size-6 text-muted-foreground" />
+                    </span>
+                    <p className="font-medium">No orders yet</p>
+                    <p className="text-sm text-muted-foreground">
+                        When you buy a book, it will show up here.
+                    </p>
+                    <Button
+                        className="mt-2"
+                        nativeButton={false}
+                        render={<Link href="/user/dashboard" />}
+                    >
+                        Browse books
+                    </Button>
+                </div>
+            ) : (
+                <ul className="space-y-3">
+                    {orders.toReversed().map((order) => {
+                        const products = order.products ?? [];
+                        return (
+                            <li key={order.id}>
+                                <button
+                                    type="button"
                                     onClick={() => handleViewProducts(order)}
+                                    className="group flex w-full items-center gap-4 rounded-2xl border bg-background p-4 text-left shadow-xs transition-all hover:border-primary/40 hover:shadow-md sm:p-5"
                                 >
-                                    <PackageOpen className="w-4 h-4" />
-                                    View Products
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    );
-                })}
-            </div>
+                                    {/* Stacked covers */}
+                                    <div className="flex shrink-0 -space-x-5">
+                                        {products.slice(0, 3).map((p, i) => (
+                                            <BookCover
+                                                key={p.id}
+                                                id={p.id}
+                                                title={p.title}
+                                                size="sm"
+                                                className="h-16 w-11"
+                                                style={{ zIndex: 3 - i }}
+                                            />
+                                        ))}
+                                        {products.length === 0 && (
+                                            <div className="flex h-16 w-11 items-center justify-center rounded-md bg-muted">
+                                                <Receipt className="size-4 text-muted-foreground" />
+                                            </div>
+                                        )}
+                                    </div>
 
-            {/* Shadcn Dialog Popup Component */}
+                                    <div className="min-w-0 flex-1 space-y-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="text-sm font-semibold">
+                                                Order #{order.id}
+                                            </span>
+                                            <OrderStatus status={order.status} />
+                                        </div>
+                                        <p className="truncate text-sm text-muted-foreground">
+                                            {products.length > 0
+                                                ? products
+                                                      .map((p) => p.title)
+                                                      .join(", ")
+                                                : "No items"}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex shrink-0 items-center gap-2">
+                                        <span className="text-lg font-semibold">
+                                            ${order.totalAmount.toFixed(2)}
+                                        </span>
+                                        <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                                    </div>
+                                </button>
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+
             {selectedOrder && (
                 <OrderDetailsPopup
                     isOpen={isPopupOpen}

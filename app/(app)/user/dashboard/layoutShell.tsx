@@ -3,34 +3,25 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
-import { Home, ShoppingCart, CreditCard, Download } from "lucide-react";
+import { BookOpen, Library, Receipt, Store } from "lucide-react";
 
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarProvider,
-    SidebarInset,
-} from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 const navItems = [
     {
-        title: "Home",
+        title: "Shop",
         url: "/user/dashboard",
-        icon: Home,
+        icon: Store,
     },
     {
-        title: "Order",
+        title: "My Orders",
         url: "/user/dashboard/order",
-        icon: ShoppingCart,
+        icon: Receipt,
     },
     {
-        title: "Download",
+        title: "My Library",
         url: "/user/dashboard/download",
-        icon: Download,
+        icon: Library,
     },
 ];
 
@@ -42,41 +33,64 @@ export default function DashboardLayoutShell({
     const pathname = usePathname();
 
     return (
-        <SidebarProvider>
-            <div className="flex min-h-screen w-full">
-                {/* Left Sidebar */}
-                <Sidebar>
-                    <SidebarHeader className="px-6 py-4 font-bold text-lg">
-                        User Panel
-                    </SidebarHeader>
-                    <SidebarContent>
-                        <SidebarMenu className="px-2">
-                            {navItems.map((item) => {
-                                const isActive = pathname === item.url;
-                                return (
-                                    <SidebarMenuItem key={item.url}>
-                                        <SidebarMenuButton
-                                            isActive={isActive}
-                                            className="w-full"
-                                        >
-                                            <Link
-                                                href={item.url}
-                                                className="flex items-center gap-3 w-full"
-                                            >
-                                                <item.icon className="h-4 w-4" />
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                );
-                            })}
-                        </SidebarMenu>
-                    </SidebarContent>
-                </Sidebar>
+        <div className="flex min-h-screen w-full flex-col bg-gradient-to-b from-muted/60 to-background">
+            {/* Top Navigation */}
+            <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md">
+                <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+                    <Link
+                        href="/user/dashboard"
+                        className="flex items-center gap-2"
+                    >
+                        <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                            <BookOpen className="size-5" />
+                        </span>
+                        <span className="font-serif text-xl font-semibold tracking-tight">
+                            Bookshelf
+                        </span>
+                    </Link>
 
-                {/* Main Content Area */}
-                <SidebarInset className="flex-1 p-6">{children}</SidebarInset>
-            </div>
-        </SidebarProvider>
+                    <nav className="flex items-center gap-1 rounded-full border bg-muted/50 p-1">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.url;
+                            return (
+                                <Link
+                                    key={item.url}
+                                    href={item.url}
+                                    aria-current={isActive ? "page" : undefined}
+                                    className={cn(
+                                        "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                                        isActive
+                                            ? "bg-background text-foreground shadow-sm"
+                                            : "text-muted-foreground hover:text-foreground",
+                                    )}
+                                >
+                                    <item.icon className="size-4" />
+                                    <span className="hidden sm:inline">
+                                        {item.title}
+                                    </span>
+                                </Link>
+                            );
+                        })}
+                    </nav>
+                </div>
+            </header>
+
+            {/* Main Content Area */}
+            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
+                {children}
+            </main>
+
+            <footer className="border-t">
+                <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:px-6">
+                    <span className="flex items-center gap-1.5">
+                        <BookOpen className="size-3.5" />
+                        Bookshelf
+                    </span>
+                    <span>
+                        Instant downloads. Read anywhere.
+                    </span>
+                </div>
+            </footer>
+        </div>
     );
 }

@@ -2,11 +2,11 @@ import axios, { AxiosInstance } from "axios";
 import { cookies } from "next/headers";
 
 const instance = axios.create({
-    baseURL: "http://localhost:8000/api",
+    baseURL: process.env(BACKEND_URL),
     timeout: 10000,
     headers: {
         "Content-Type": "application/json",
-        Accept: "application/json",
+        "Accept": "application/json",
     },
 });
 

@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { ProductType } from "../../components/product";
 import { getOrderedProducts, getOrderDownloadUrl } from "@/app/actions/shared/product";
 
 // Shadcn UI Imports
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Download } from "lucide-react";
+import { Download, Library, Loader2 } from "lucide-react";
+import BookCover from "../../components/bookCover";
 
 export default function DownloadList() {
     const [orderedProducts, setOrderedProducts] = useState<ProductType[]>([]);
@@ -28,7 +29,7 @@ export default function DownloadList() {
             } finally {
                 setLoading(false);
             }
-        }   
+        }
         fetchOrderedProduct();
     }, []);
 
@@ -51,47 +52,69 @@ export default function DownloadList() {
     };
 
     return (
-        <div className="p-6 max-w-4xl mx-auto space-y-6">
+        <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold tracking-tight">My Downloads</h1>
-                <p className="text-sm text-muted-foreground">Access and download your purchased digital products.</p>
+                <h1 className="font-serif text-3xl font-semibold tracking-tight">My Library</h1>
+                <p className="text-sm text-muted-foreground">
+                    {loading
+                        ? "Your purchased books, ready to download."
+                        : `${orderedProducts.length} ${orderedProducts.length === 1 ? "book" : "books"} in your collection.`}
+                </p>
             </div>
 
             {/* Loading State with Skeletons */}
             {loading ? (
-                <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                        <Skeleton key={i} className="h-24 w-full rounded-xl" />
+                <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="space-y-3">
+                            <Skeleton className="aspect-[3/4] w-full rounded-md" />
+                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-8 w-full rounded-full" />
+                        </div>
                     ))}
                 </div>
             ) : orderedProducts.length === 0 ? (
-                <Card className="p-6 text-center text-muted-foreground">
-                    No purchased products available for download yet.
-                </Card>
+                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed bg-background py-16 text-center">
+                    <span className="flex size-14 items-center justify-center rounded-full bg-muted">
+                        <Library className="size-6 text-muted-foreground" />
+                    </span>
+                    <p className="font-medium">Your library is empty</p>
+                    <p className="text-sm text-muted-foreground">
+                        Books you purchase will appear here for download.
+                    </p>
+                    <Button className="mt-2" nativeButton={false}
+                        render={<Link href="/user/dashboard" />}>
+                        Browse books
+                    </Button>
+                </div>
             ) : (
-                /* Product Download Grid / Cards */
-                <div className="grid gap-4">
+                /* Bookshelf grid */
+                <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
                     {orderedProducts.toReversed().map((product) => (
-                        <Card key={product.id} className="relative p-6 pr-32 space-y-2 flex flex-col justify-center">
-                            {/* Upper-right Download Button */}
-                            <Button 
+                        <article key={product.id} className="group flex flex-col">
+                            <BookCover
+                                id={product.id}
+                                title={product.title}
+                                className="aspect-[3/4] w-full transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
+                            />
+                            <h3 className="mt-3 line-clamp-1 text-sm font-semibold">{product.title}</h3>
+                            <p className="line-clamp-1 text-xs text-muted-foreground">{product.description}</p>
+                            <Button
                                 size="sm"
-                                className="absolute top-4 right-4 flex items-center gap-2"
+                                variant="outline"
+                                className="mt-3 w-full gap-2"
                                 onClick={() => handleDownload(product.id, product.title)}
                                 disabled={downloadingId === product.id}
                             >
-                                <Download className="w-4 h-4" />
+                                {downloadingId === product.id ? (
+                                    <Loader2 className="size-4 animate-spin" />
+                                ) : (
+                                    <Download className="size-4" />
+                                )}
                                 {downloadingId === product.id ? "Preparing..." : "Download"}
                             </Button>
-
-                            {/* Card Details */}
-                            <h3 className="font-semibold text-lg">{product.title}</h3>
-                            <p className="text-sm text-muted-foreground">{product.description}</p>
-                            <span className="inline-block text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-md w-fit">
-                                Purchased
-                            </span>
-                        </Card>
+                        </article>
                     ))}
                 </div>
             )}

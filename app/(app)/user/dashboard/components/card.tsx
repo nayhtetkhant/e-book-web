@@ -2,17 +2,9 @@
 
 import { useState } from "react";
 import { OrderType, ProductType } from "./product";
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Minus, ShoppingCart } from "lucide-react";
-import { set } from "react-hook-form";
+import { Check, Plus, Minus, ShoppingCart } from "lucide-react";
+import BookCover from "./bookCover";
 
 export default function ProductCard({
     product,
@@ -22,6 +14,7 @@ export default function ProductCard({
     onAddToCart: (order: OrderType) => void;
 }) {
     const [quantity, setQuantity] = useState<number>(1);
+    const [justAdded, setJustAdded] = useState(false);
 
     const handleDecrement = () => {
         if (quantity > 1) {
@@ -29,74 +22,83 @@ export default function ProductCard({
         }
     };
 
+    const handleAdd = () => {
+        onAddToCart({
+            id: product.id,
+            quantity: quantity,
+        });
+        setQuantity(1);
+        setJustAdded(true);
+        setTimeout(() => setJustAdded(false), 1500);
+    };
+
     return (
-        <Card className="w-full h-full flex flex-col justify-between shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-            <div>
-                <CardHeader className="p-4 sm:p-6">
-                    <CardTitle className="text-lg font-bold line-clamp-1">
-                        {product.title}
-                    </CardTitle>
-                    <CardDescription className="line-clamp-2 min-h text-xs sm:text-sm">
-                        {product.description}
-                    </CardDescription>
-                </CardHeader>
-
-                <CardContent className="p-4 sm:p-6 pt-0 space-y-4">
-                    {/* Price */}
-                    <div className="text-xl sm:text-2xl font-semibold text-primary">
-                        ${product.price.toFixed(2)}
-                    </div>
-
-                    {/* Compact Quantity Controls to prevent overflow */}
-                    <div className="flex items-center justify-between bg-muted/40 px-2.5 py-1.5 rounded-lg border gap-2">
-                        <span className="text-xs sm:text-sm font-medium text-muted-foreground">
-                            Qty
-                        </span>
-                        <div className="flex items-center gap-1">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="h-6 w-6 shrink-0"
-                                onClick={handleDecrement}
-                                disabled={quantity <= 1}
-                            >
-                                <Minus className="h-3 w-3" />
-                            </Button>
-
-                            <span className="w-5 text-center text-xs sm:text-sm font-semibold">
-                                {quantity}
-                            </span>
-
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="h-6 w-6 shrink-0"
-                                onClick={() => setQuantity(quantity + 1)}
-                            >
-                                <Plus className="h-3 w-3" />
-                            </Button>
-                        </div>
-                    </div>
-                </CardContent>
+        <article className="group flex h-full flex-col">
+            {/* Cover */}
+            <div className="relative rounded-xl bg-muted/60 p-5 transition-colors group-hover:bg-muted">
+                <BookCover
+                    id={product.id}
+                    title={product.title}
+                    className="mx-auto aspect-[3/4] w-full max-w-44 transition-transform duration-300 group-hover:-translate-y-1 group-hover:rotate-[-1deg] group-hover:shadow-xl"
+                />
             </div>
 
-            <CardFooter className="p-4 sm:p-6 pt-0">
+            {/* Details */}
+            <div className="flex flex-1 flex-col pt-3">
+                <h3 className="line-clamp-1 font-semibold">{product.title}</h3>
+                <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground sm:text-sm">
+                    {product.description}
+                </p>
+
+                <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+                    <span className="text-lg font-semibold">
+                        ${product.price.toFixed(2)}
+                    </span>
+
+                    <div className="flex items-center rounded-full border bg-background">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={handleDecrement}
+                            disabled={quantity <= 1}
+                            aria-label="Decrease quantity"
+                        >
+                            <Minus />
+                        </Button>
+                        <span className="w-5 text-center text-xs font-semibold">
+                            {quantity}
+                        </span>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={() => setQuantity(quantity + 1)}
+                            aria-label="Increase quantity"
+                        >
+                            <Plus />
+                        </Button>
+                    </div>
+                </div>
+
                 <Button
-                    className="w-full gap-2 text-xs sm:text-sm"
-                    onClick={() => {
-                        onAddToCart({
-                            id: product.id,
-                            quantity: quantity,
-                        });
-                        setQuantity(1);
-                    }}
+                    className="mt-3 w-full gap-2"
+                    variant={justAdded ? "secondary" : "default"}
+                    onClick={handleAdd}
                 >
-                    <ShoppingCart className="h-4 w-4" />
-                    Add to Cart
+                    {justAdded ? (
+                        <>
+                            <Check className="size-4" />
+                            Added
+                        </>
+                    ) : (
+                        <>
+                            <ShoppingCart className="size-4" />
+                            Add to Cart
+                        </>
+                    )}
                 </Button>
-            </CardFooter>
-        </Card>
+            </div>
+        </article>
     );
 }
