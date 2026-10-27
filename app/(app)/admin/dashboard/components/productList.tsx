@@ -1,5 +1,6 @@
 "use client";
 
+import { DownloadProductButton } from "./downloadProductButton";
 import { ProductType } from "@/app/(app)/user/dashboard/components/product";
 import {
     createProduct,
@@ -24,7 +25,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Plus, Edit3 } from "lucide-react";
+import { Plus, Edit3 } from "lucide-react";
 
 type ProductFormValues = {
     title: string;
@@ -191,9 +192,7 @@ export default function ProductList() {
                                     {product.description || "No description provided."}
                                 </p>
                                 {product.filePath && (
-                                    <div className="flex items-center gap-1.5 text-xs text-primary font-medium pt-1">
-                                        <FileText className="w-3.5 h-3.5" /> Attached file configured
-                                    </div>
+                                    <DownloadProductButton productId={product.id} />
                                 )}
                             </div>
                         </Card>

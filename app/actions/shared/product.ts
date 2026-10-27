@@ -44,3 +44,10 @@ export async function getOrderDownloadUrl(id: number) {
 
     return response.data.data ?? response.data;
 }
+
+export async function getAdminProductDownloadUrl(id: number) {
+    const serverApi = await api();
+    const response = await serverApi.get(`/admin/v1/products/${id}/download`);
+
+    return response.data.download_url as string;
+}
