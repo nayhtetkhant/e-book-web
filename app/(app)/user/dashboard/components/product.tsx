@@ -79,10 +79,6 @@ export default function Product() {
                 <div className="absolute -bottom-24 right-24 size-72 rounded-full bg-emerald-300/20 blur-3xl" />
 
                 <div className="relative max-w-xl space-y-5">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur">
-                        <Sparkles className="size-3.5" />
-                        Instant digital delivery
-                    </span>
                     <h1 className="font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
                         Find your next great read.
                     </h1>

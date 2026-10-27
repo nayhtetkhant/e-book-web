@@ -88,9 +88,6 @@ export default function DashboardLayoutShell({
                         <BookOpen className="size-3.5" />
                         Bookshelf
                     </span>
-                    <span>
-                        Instant downloads. Read anywhere.
-                    </span>
                 </div>
             </footer>
         </div>

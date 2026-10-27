@@ -48,10 +48,6 @@ export default function AdminLoginForm() {
             Sign in to pick up where you left off and access your library anywhere.
           </p>
         </div>
-
-        <p className="relative text-xs text-primary-foreground/60">
-          Instant downloads. Read anywhere.
-        </p>
       </div>
 
       {/* Form */}
