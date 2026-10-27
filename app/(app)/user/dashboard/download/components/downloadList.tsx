@@ -3,18 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ProductType } from "../../components/product";
-import { getOrderedProducts, getOrderDownloadUrl } from "@/app/actions/shared/product";
+import { getOrderedProducts } from "@/app/actions/shared/product";
 
 // Shadcn UI Imports
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Download, Library, Loader2 } from "lucide-react";
+import { Library } from "lucide-react";
+import { DownloadProductButton } from "../../components/downloadProductButton";
 import BookCover from "../../components/bookCover";
 
 export default function DownloadList() {
     const [orderedProducts, setOrderedProducts] = useState<ProductType[]>([]);
     const [loading, setLoading] = useState(true);
-    const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
     useEffect(() => {
         async function fetchOrderedProduct() {
@@ -32,24 +32,6 @@ export default function DownloadList() {
         }
         fetchOrderedProduct();
     }, []);
-
-    const handleDownload = async (productId: number, title: string) => {
-        try {
-            setDownloadingId(productId);
-            const response = await getOrderDownloadUrl(productId);
-            const downloadUrl = response?.download_url ?? response?.url ?? response;
-
-            if (downloadUrl) {
-                window.open(downloadUrl, '_blank');
-            } else {
-                console.error("Download URL not found in response");
-            }
-        } catch (error) {
-            console.error(`Failed to download file for product ${title}:`, error);
-        } finally {
-            setDownloadingId(null);
-        }
-    };
 
     return (
         <div className="space-y-8">
@@ -100,20 +82,13 @@ export default function DownloadList() {
                             />
                             <h3 className="mt-3 line-clamp-1 text-sm font-semibold">{product.title}</h3>
                             <p className="line-clamp-1 text-xs text-muted-foreground">{product.description}</p>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="mt-3 w-full gap-2"
-                                onClick={() => handleDownload(product.id, product.title)}
-                                disabled={downloadingId === product.id}
-                            >
-                                {downloadingId === product.id ? (
-                                    <Loader2 className="size-4 animate-spin" />
+                            <div className="mt-3">
+                                {product.filePath ? (
+                                    <DownloadProductButton productId={product.id} />
                                 ) : (
-                                    <Download className="size-4" />
+                                    <span className="text-xs text-muted-foreground">File unavailable</span>
                                 )}
-                                {downloadingId === product.id ? "Preparing..." : "Download"}
-                            </Button>
+                            </div>
                         </article>
                     ))}
                 </div>

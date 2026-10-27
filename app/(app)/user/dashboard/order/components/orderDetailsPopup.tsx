@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { OrderDetailType, OrderStatus } from "./orderList";
+import { DownloadProductButton } from "../../components/downloadProductButton";
 import BookCover from "../../components/bookCover";
 
 interface OrderDetailsPopupProps {
@@ -66,9 +67,12 @@ export default function OrderDetailsPopup({
                                             ${product.price.toFixed(2)} × {qty}
                                         </span>
                                     </div>
-                                    <span className="shrink-0 text-sm font-semibold">
-                                        ${subtotal.toFixed(2)}
-                                    </span>
+                                    <div className="flex shrink-0 flex-col items-end gap-2">
+                                        <span className="text-sm font-semibold">${subtotal.toFixed(2)}</span>
+                                        {product.filePath && ["paid", "completed"].includes(order.status) && (
+                                            <DownloadProductButton productId={product.id} />
+                                        )}
+                                    </div>
                                 </li>
                             );
                         })}
