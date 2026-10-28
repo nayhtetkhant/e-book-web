@@ -23,6 +23,12 @@ Browse the e-book collection, select quantities, and add products to the cart.
 
 ![Digital Product Storefront](docs/screenshots/storefront.png)
 
+### Stripe Checkout
+
+Complete the purchase through Stripe Checkout.
+
+![Stripe Checkout](docs/screenshots/stripeCheckout.png)
+
 ### Customer Orders
 
 View purchase history, order totals, and pending or completed statuses.
