@@ -7,6 +7,52 @@ Built as a full-stack portfolio project using **React, Next.js, TypeScript, Lara
 - **Frontend — this repository:** [e-book-web](https://github.com/nayhtetkhant/e-book-web)
 - **Backend API:** [e-book-api](https://github.com/nayhtetkhant/e-book-api)
 
+## Screenshots
+
+Screenshots from the development application, showing customer and administrator workflows.
+
+### Customer Login
+
+Bookshelf sign-in page.
+
+![Customer Login](docs/screenshots/login.png)
+
+### Digital Product Storefront
+
+Browse the e-book collection, select quantities, and add products to the cart.
+
+![Digital Product Storefront](docs/screenshots/storefront.png)
+
+### Customer Orders
+
+View purchase history, order totals, and pending or completed statuses.
+
+![Customer Orders](docs/screenshots/customer-orders.png)
+
+### Customer Library
+
+Access purchased titles and download available files; titles without an attached file show an unavailable state.
+
+![Customer Library](docs/screenshots/customer-library.png)
+
+### Payment Management
+
+Review payment records, amounts, and transaction statuses.
+
+![Payment Management](docs/screenshots/admin-payments.png)
+
+### Product Management
+
+Create and edit digital products, manage prices, and access attached files.
+
+![Product Management](docs/screenshots/admin-products.png)
+
+### Order Management
+
+Review customer orders, totals, statuses, and associated products.
+
+![Order Management](docs/screenshots/admin-orders.png)
+
 ## Features
 
 ### Customer Dashboard
@@ -85,7 +131,6 @@ For downloads, the frontend requests a URL on demand. The companion backend curr
 git clone https://github.com/nayhtetkhant/e-book-web.git
 cd e-book-web
 npm ci
-cp .env.example .env
 npm run dev
 ```
 
@@ -93,13 +138,13 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### API Configuration
 
-Set the backend API base URL in the project-root `.env` file:
+The API base URL is currently set in `app/libs/api.ts`:
 
-```dotenv
-API_BASE_URL=http://localhost:8000
+```ts
+baseURL: "http://localhost:8000/api"
 ```
 
-`app/libs/api.ts` reads `process.env.API_BASE_URL` on the server. Set this value to your backend origin (scheme, domain, and optional port), without a path. The API client appends `/api`. Update it for your deployment and restart the development server after editing it. `.env` is ignored by Git; `.env.example` provides the setup template.
+Change it to match your API deployment. Environment-based configuration is a planned improvement; adding an environment variable alone will not change the current client.
 
 Set up the [Laravel backend](https://github.com/nayhtetkhant/e-book-api) separately, including database migrations, development users, Stripe webhook delivery, and S3 credentials. Configure S3 CORS to allow the frontend origin to upload using PUT requests.
 
@@ -185,5 +230,3 @@ Cloudflare R2 is an alternative to evaluate for S3-compatible storage. CDN deliv
 ## Project Status
 
 This is a development portfolio project. It demonstrates frontend integration with digital commerce and file-delivery workflows; licensing, watermarking, 3D viewers, and PayPal are planned extensions.
-
-This documentation is based on source inspection. Builds, payment processing, S3 transfers, and end-to-end behavior have not been independently verified as part of this README update.
