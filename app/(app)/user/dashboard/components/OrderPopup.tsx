@@ -42,13 +42,6 @@ export default function OrderPopup({
     const handleCheckout = async () => {
         if (isSubmitting) return;
 
-        const checkoutTab = window.open("about:blank", "_blank");
-        if (!checkoutTab) {
-            setError("Allow pop-ups to open Stripe checkout in a new tab.");
-            return;
-        }
-        checkoutTab.opener = null;
-
         setIsSubmitting(true);
         setError(null);
 
@@ -60,16 +53,9 @@ export default function OrderPopup({
                 throw new Error("Checkout is unavailable. Please try again.");
             }
 
-            if (checkoutTab.closed) {
-                throw new Error("Checkout tab was closed.");
-            }
-
-            checkoutTab.location.replace(checkoutUrl);
-            onDismiss();
+            window.location.href = checkoutUrl;
         } catch {
-            checkoutTab.close();
             setError("Unable to open checkout. Please try again.");
-        } finally {
             setIsSubmitting(false);
         }
     };
@@ -160,7 +146,7 @@ export default function OrderPopup({
                         ) : (
                             <Lock className="size-4" />
                         )}
-                        {isSubmitting ? "Opening checkout..." : "Proceed to Checkout"}
+                        {isSubmitting ? "Redirecting to checkout..." : "Proceed to Checkout"}
                     </Button>
                 </DialogFooter>
             </DialogContent>
