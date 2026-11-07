@@ -56,17 +56,12 @@ export default function OrderPopup({
                 throw new Error("Checkout is unavailable. Please try again.");
             }
 
-            onDismiss();
-
-            setTimeout(() => {
-                window.location.assign(checkoutUrl);
-            }, 50);
+            window.location.href = checkoutUrl;
         } catch {
             setError("Unable to open checkout. Please try again.");
             setIsSubmitting(false);
         }
     };
-
     return (
         <Dialog open={isOpen} onOpenChange={onDismiss}>
             <DialogContent className="flex flex-col gap-5 p-6 sm:max-w-md">
