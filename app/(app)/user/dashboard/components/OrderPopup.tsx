@@ -39,7 +39,10 @@ export default function OrderPopup({
             return sum + (product ? product.price * order.quantity : 0);
         }, 0) || 0;
 
-    const handleCheckout = async () => {
+    const handleCheckout = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         if (isSubmitting) return;
 
         setIsSubmitting(true);
@@ -53,7 +56,11 @@ export default function OrderPopup({
                 throw new Error("Checkout is unavailable. Please try again.");
             }
 
-            window.location.href = checkoutUrl;
+            onDismiss();
+
+            setTimeout(() => {
+                window.location.assign(checkoutUrl);
+            }, 50);
         } catch {
             setError("Unable to open checkout. Please try again.");
             setIsSubmitting(false);
@@ -116,7 +123,6 @@ export default function OrderPopup({
                             })}
                         </ul>
 
-                        {/* Grand Total Section */}
                         <div className="flex items-center justify-between rounded-xl bg-muted/60 px-4 py-3">
                             <span className="text-sm text-muted-foreground">
                                 Total
@@ -132,12 +138,16 @@ export default function OrderPopup({
                     </p>
                 )}
 
-                {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+                {error && (
+                    <p role="alert" className="text-sm text-destructive">
+                        {error}
+                    </p>
+                )}
 
                 <DialogFooter className="flex-col gap-2 sm:flex-col">
                     <Button
                         size="lg"
-                        onClick={handleCheckout}
+                        onClick={(e) => handleCheckout(e)}
                         disabled={isSubmitting || !orders?.length}
                         className="w-full gap-2"
                     >
@@ -146,7 +156,9 @@ export default function OrderPopup({
                         ) : (
                             <Lock className="size-4" />
                         )}
-                        {isSubmitting ? "Redirecting to checkout..." : "Proceed to Checkout"}
+                        {isSubmitting
+                            ? "Redirecting to checkout..."
+                            : "Proceed to Checkout"}
                     </Button>
                 </DialogFooter>
             </DialogContent>
