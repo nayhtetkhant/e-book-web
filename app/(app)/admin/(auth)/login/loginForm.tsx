@@ -28,8 +28,8 @@ export type LoginFormType = {
 export default function AdminLoginForm() {
   const form = useForm<LoginFormType>({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "admin@example.com",
+      password: "password",
     },
   })
 

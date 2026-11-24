@@ -14,11 +14,11 @@ import { BookOpen } from "lucide-react"
 import { LoginFormType } from "@/app/(app)/admin/(auth)/login/loginForm"
 import { userLogin } from "@/app/actions/user/auth"
 
-export default function AdminLoginForm() {
+export default function UserLoginForm() {
   const form = useForm<LoginFormType>({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "test1@example.com",
+      password: "password",
     },
   })
 
